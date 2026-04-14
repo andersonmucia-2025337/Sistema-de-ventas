@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Sistema de Ventas</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/home.css}">
+</head>
+<body>
+<nav class="navbar">
+    <h1>Sistema de Ventas - Repuestos Automotrices</h1>
+    <div class="user-info">
+        <span th:text="'Bienvenido, ' + ${session.usuarioLogueado}"></span>
+        <a href="/logout" class="btn-logout">Cerrar Sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="dashboard">
+        <div class="card">
+            <h3>📊 Ventas del Día</h3>
+            <p>Aquí se mostrarán las ventas realizadas hoy</p>
+        </div>
+
+        <div class="card">
+            <h3>📦 Productos con Bajo Stock</h3>
+            <p>Monitoreo de inventario</p>
+        </div>
+
+        <div class="card">
+            <h3>👥 Clientes Registrados</h3>
+            <p>Gestión de clientes</p>
+        </div>
+    </div>
+
+    <div class="welcome-section">
+        <h2>Bienvenido al Sistema de Ventas</h2>
+        <p>Seleccione una opción del menú para comenzar a trabajar</p>
+    </div>
+</div>
+</body>
+</html>
