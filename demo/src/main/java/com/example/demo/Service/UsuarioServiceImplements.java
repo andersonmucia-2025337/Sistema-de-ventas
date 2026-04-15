@@ -26,6 +26,11 @@ public class UsuarioServiceImplements implements UsuarioService {
     }
 
     @Override
+    public Usuario buscarPorUsername(String username) {
+        return usuarioRepository.findByUsername(username).orElse(null);
+    }
+
+    @Override
     public Usuario guardarUsuario(Usuario usuario) throws RuntimeException {
         try {
             usuario.setEstado(1);
