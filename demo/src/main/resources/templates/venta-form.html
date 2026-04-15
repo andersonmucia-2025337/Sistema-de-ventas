@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${titulo}"></title>
+  <link rel="stylesheet" th:href="@{/css/home.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<nav class="navbar">
+  <h1><i class="fas fa-car"></i> Sistema de Ventas</h1>
+  <div class="user-info">
+    <span><i class="fas fa-user-circle"></i> <span th:text="${session.usuarioLogueado}"></span></span>
+    <a href="/logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-header">
+      <h2 th:text="${titulo}"></h2>
+    </div>
+
+    <div th:if="${param.error}" class="error-message" th:text="${param.error}"></div>
+
+    <form th:action="${venta.codigoVenta == null ? '/venta/guardar' : '/venta/actualizar/' + venta.codigoVenta}" method="post">
+      <div class="form-group">
+        <label>Fecha de Venta:</label>
+        <input type="date" name="fechaVenta" th:value="${venta.fechaVenta}" required>
+      </div>
+
+      <div class="form-group">
+        <label>Total:</label>
+        <input type="number" step="0.01" name="total" th:value="${venta.total}" required>
+      </div>
+
+      <div class="form-group">
+        <label>Estado:</label>
+        <select name="estado">
+          <option value="1" th:selected="${venta.estado == 1}">Activa</option>
+          <option value="0" th:selected="${venta.estado == 0}">Anulada</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Cliente (DPI):</label>
+        <select name="clienteDpi" required>
+          <option value="">Seleccione un cliente</option>
+          <option th:each="cliente : ${clientes}"
+                  th:value="${cliente.dpiCliente}"
+                  th:text="${cliente.dpiCliente + ' - ' + cliente.nombreCliente + ' ' + cliente.apellidoCliente}"
+                  th:selected="${venta.cliente != null and venta.cliente.dpiCliente == cliente.dpiCliente}">
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Usuario (ID):</label>
+        <select name="usuarioCodigo" required>
+          <option value="">Seleccione un usuario</option>
+          <option th:each="usuario : ${usuarios}"
+                  th:value="${usuario.codigoUsuario}"
+                  th:text="${usuario.codigoUsuario + ' - ' + usuario.username + ' (' + usuario.rol + ')'}"
+                  th:selected="${venta.usuario != null and venta.usuario.codigoUsuario == usuario.codigoUsuario}">
+          </option>
+        </select>
+      </div>
+
+      <div class="modal-buttons" style="margin-top: 20px;">
+        <button type="submit" class="btn-save">Guardar</button>
+        <a href="/home" class="btn-cancel">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

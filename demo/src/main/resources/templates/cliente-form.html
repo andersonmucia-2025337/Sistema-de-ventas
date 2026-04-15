@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}"></title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .btn-save {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            display: inline-block;
+            text-align: center;
+        }
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <h1><i class="fas fa-car"></i> Sistema de Ventas</h1>
+    <div class="user-info">
+        <span><i class="fas fa-user-circle"></i> <span th:text="${session.usuarioLogueado}"></span></span>
+        <a href="/logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="form-container">
+        <h2 th:text="${titulo}"></h2>
+
+        <div th:if="${param.error}" class="error-msg" th:text="${param.error}"></div>
+
+        <form th:action="${cliente.dpiCliente == null ? '/cliente/guardar' : '/cliente/actualizar/' + cliente.dpiCliente}" method="post">
+            <div th:if="${cliente.dpiCliente != null}" class="form-group">
+                <label>DPI:</label>
+                <input type="text" th:value="${cliente.dpiCliente}" readonly disabled>
+                <input type="hidden" name="dpiCliente" th:value="${cliente.dpiCliente}">
+            </div>
+
+            <div class="form-group">
+                <label>DPI:</label>
+                <input type="number" name="dpiCliente" th:value="${cliente.dpiCliente}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Nombre:</label>
+                <input type="text" name="nombreCliente" th:value="${cliente.nombreCliente}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Apellido:</label>
+                <input type="text" name="apellidoCliente" th:value="${cliente.apellidoCliente}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Dirección:</label>
+                <input type="text" name="direccion" th:value="${cliente.direccion}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Estado:</label>
+                <select name="estado">
+                    <option value="1" th:selected="${cliente.estado == 1}">Activo</option>
+                    <option value="0" th:selected="${cliente.estado == 0}">Inactivo</option>
+                </select>
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit" class="btn-save"><i class="fas fa-save"></i> Guardar</button>
+                <a href="/home" class="btn-cancel"><i class="fas fa-times"></i> Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

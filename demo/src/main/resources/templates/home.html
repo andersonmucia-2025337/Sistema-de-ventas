@@ -3,40 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Sistema de Ventas</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/home.css}">
+    <title>Dashboard - Sistema de Ventas</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 <nav class="navbar">
-    <h1>Sistema de Ventas - Repuestos Automotrices</h1>
+    <h1><i class="fa-solid fa-car"></i> Sistema de Ventas - Repuestos Automotrices</h1>
     <div class="user-info">
-        <span th:text="'Bienvenido, ' + ${session.usuarioLogueado}"></span>
-        <a href="/logout" class="btn-logout">Cerrar Sesión</a>
+        <span><i class="fas fa-user-circle"></i> <span th:text="${session.usuarioLogueado}"></span> | Rol: <span th:text="${session.rol}"></span></span>
+        <a href="/logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
     </div>
 </nav>
 
 <div class="container">
-    <div class="dashboard">
-        <div class="card">
-            <h3>📊 Ventas del Día</h3>
-            <p>Aquí se mostrarán las ventas realizadas hoy</p>
-        </div>
+    <!-- Pestañas -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('clientes')"><i class="fas fa-users"></i> Clientes</button>
+        <button class="tab-btn" onclick="showTab('usuarios')"><i class="fas fa-user-shield"></i> Usuarios</button>
+        <button class="tab-btn" onclick="showTab('productos')"><i class="fas fa-boxes"></i> Productos</button>
+        <button class="tab-btn" onclick="showTab('ventas')"><i class="fas fa-shopping-cart"></i> Ventas</button>
+        <button class="tab-btn" onclick="showTab('detalles')"><i class="fas fa-receipt"></i> Detalle Ventas</button>
+    </div>
 
+    <!-- Clientes -->
+    <div id="clientes" class="tab-content active">
         <div class="card">
-            <h3>📦 Productos con Bajo Stock</h3>
-            <p>Monitoreo de inventario</p>
-        </div>
-
-        <div class="card">
-            <h3>👥 Clientes Registrados</h3>
-            <p>Gestión de clientes</p>
+            <div class="card-header">
+                <h2><i class="fas fa-users"></i> Clientes</h2>
+                <a th:if="${isAdmin}" href="/cliente/nuevo" class="btn-add"><i class="fas fa-plus"></i> Nuevo Cliente</a>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>DPI</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Dirección</th>
+                        <th>Estado</th>
+                        <th th:if="${isAdmin}">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${clientes.empty}">
+                        <td colspan="6" class="empty-row">No hay clientes registrados</td>
+                    </tr>
+                    <tr th:each="cliente : ${clientes}">
+                        <td th:text="${cliente.dpiCliente}"></td>
+                        <td>
+                            <img src="/images/user-icon.png" alt="avatar" class="user-avatar" onerror="this.src='https://via.placeholder.com/35?text=U'">
+                            <span th:text="${cliente.nombreCliente}"></span>
+                        </td>
+                        <td th:text="${cliente.apellidoCliente}"></td>
+                        <td th:text="${cliente.direccion}"></td>
+                        <td><span th:text="${cliente.estado == 1 ? 'Activo' : 'Inactivo'}"></span></td>
+                        <td th:if="${isAdmin}">
+                            <a th:href="@{/cliente/editar/{id}(id=${cliente.dpiCliente})}" class="btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                            <a th:href="@{/cliente/eliminar/{id}(id=${cliente.dpiCliente})}" class="btn-delete" onclick="return confirm('¿Eliminar este cliente?')"><i class="fas fa-trash-alt"></i> Eliminar</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div class="welcome-section">
-        <h2>Bienvenido al Sistema de Ventas</h2>
-        <p>Seleccione una opción del menú para comenzar a trabajar</p>
+    <!-- Usuarios -->
+    <div id="usuarios" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-user-shield"></i> Usuarios</h2>
+                <a th:if="${isAdmin}" href="/usuario/nuevo" class="btn-add"><i class="fas fa-plus"></i> Nuevo Usuario</a>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th th:if="${isAdmin}">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${usuarios.empty}">
+                        <td colspan="6" class="empty-row">No hay usuarios registrados</td>
+                    </tr>
+                    <tr th:each="usuario : ${usuarios}">
+                        <td th:text="${usuario.codigoUsuario}"></td>
+                        <td>
+                            <img th:src="${usuario.username == 'admin' ? '/images/admin-icon.png' : '/images/user-icon.png'}"
+                                 alt="avatar"
+                                 class="user-avatar"
+                                 onerror="this.src='https://via.placeholder.com/35?text=U'">
+                            <span th:text="${usuario.username}"></span>
+                        </td>
+                        <td th:text="${usuario.email}"></td>
+                        <td th:text="${usuario.rol}"></td>
+                        <td><span th:text="${usuario.estado == 1 ? 'Activo' : 'Inactivo'}"></span></td>
+                        <td th:if="${isAdmin}">
+                            <a th:href="@{/usuario/editar/{id}(id=${usuario.codigoUsuario})}" class="btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                            <a th:href="@{/usuario/eliminar/{id}(id=${usuario.codigoUsuario})}" class="btn-delete" onclick="return confirm('¿Eliminar este usuario?')"><i class="fas fa-trash-alt"></i> Eliminar</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Productos -->
+    <div id="productos" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-boxes"></i> Productos</h2>
+                <a th:if="${isAdmin}" href="/producto/nuevo" class="btn-add"><i class="fas fa-plus"></i> Nuevo Producto</a>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th th:if="${isAdmin}">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${productos.empty}">
+                        <td colspan="6" class="empty-row">No hay productos registrados</td>
+                    </tr>
+                    <tr th:each="producto : ${productos}">
+                        <td th:text="${producto.codigoProducto}"></td>
+                        <td th:text="${producto.nombreProducto}"></td>
+                        <td>Q. <span th:text="${producto.precio}"></span></td>
+                        <td th:text="${producto.stock}"></td>
+                        <td><span th:text="${producto.estado == 1 ? 'Activo' : 'Inactivo'}"></span></td>
+                        <td th:if="${isAdmin}">
+                            <a th:href="@{/producto/editar/{id}(id=${producto.codigoProducto})}" class="btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                            <a th:href="@{/producto/eliminar/{id}(id=${producto.codigoProducto})}" class="btn-delete" onclick="return confirm('¿Eliminar este producto?')"><i class="fas fa-trash-alt"></i> Eliminar</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ventas -->
+    <div id="ventas" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-shopping-cart"></i> Ventas</h2>
+                <a th:if="${isAdmin}" href="/venta/nuevo" class="btn-add"><i class="fas fa-plus"></i> Nueva Venta</a>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID Venta</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Cliente</th>
+                        <th>Vendedor</th>
+                        <th>Estado</th>
+                        <th th:if="${isAdmin}">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${ventas.empty}">
+                        <td colspan="7" class="empty-row">No hay ventas registradas</td>
+                    </tr>
+                    <tr th:each="venta : ${ventas}">
+                        <td th:text="${venta.codigoVenta}"></td>
+                        <td th:text="${venta.fechaVenta}"></td>
+                        <td>Q. <span th:text="${venta.total}"></span></td>
+                        <td th:text="${venta.cliente != null ? venta.cliente.nombreCliente + ' ' + venta.cliente.apellidoCliente : 'N/A'}"></td>
+                        <td th:text="${venta.usuario != null ? venta.usuario.username : 'N/A'}"></td>
+                        <td><span th:text="${venta.estado == 1 ? 'Activa' : 'Anulada'}"></span></td>
+                        <td th:if="${isAdmin}">
+                            <a th:href="@{/venta/editar/{id}(id=${venta.codigoVenta})}" class="btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                            <a th:href="@{/venta/eliminar/{id}(id=${venta.codigoVenta})}" class="btn-delete" onclick="return confirm('¿Eliminar esta venta?')"><i class="fas fa-trash-alt"></i> Eliminar</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalle Ventas -->
+    <div id="detalles" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-receipt"></i> Detalle de Ventas</h2>
+                <a th:if="${isAdmin}" href="/detalle/nuevo" class="btn-add"><i class="fas fa-plus"></i> Nuevo Detalle</a>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID Detalle</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Subtotal</th>
+                        <th>Producto</th>
+                        <th>Venta ID</th>
+                        <th th:if="${isAdmin}">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${detalles.empty}">
+                        <td colspan="7" class="empty-row">No hay detalles de venta registrados</td>
+                    </tr>
+                    <tr th:each="detalle : ${detalles}">
+                        <td th:text="${detalle.codigoDetalleVenta}"></td>
+                        <td th:text="${detalle.cantidad}"></td>
+                        <td>Q. <span th:text="${detalle.precioUnitario}"></span></td>
+                        <td>Q. <span th:text="${detalle.subtotal}"></span></td>
+                        <td th:text="${detalle.producto != null ? detalle.producto.nombreProducto : 'N/A'}"></td>
+                        <td th:text="${detalle.venta != null ? detalle.venta.codigoVenta : 'N/A'}"></td>
+                        <td th:if="${isAdmin}">
+                            <a th:href="@{/detalle/editar/{id}(id=${detalle.codigoDetalleVenta})}" class="btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                            <a th:href="@{/detalle/eliminar/{id}(id=${detalle.codigoDetalleVenta})}" class="btn-delete" onclick="return confirm('¿Eliminar este detalle?')"><i class="fas fa-trash-alt"></i> Eliminar</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    function showTab(tabId) {
+        // Ocultar todos los contenidos
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        // Remover active de todos los botones
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        // Mostrar el contenido seleccionado
+        document.getElementById(tabId).classList.add('active');
+        // Activar el botón correspondiente
+        event.target.classList.add('active');
+    }
+</script>
 </body>
 </html>
